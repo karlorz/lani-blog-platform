@@ -9,12 +9,12 @@ export interface SignUpParams {
 
 const onMutate = async (params: SignUpParams) => {
   const { username, password, confirmPassword } = params;
-  await axios.post("/api/registration", {
-    user: {
+  await axios.post("/api/v1/auth/register", {
+    // user: {
       email: username,
       password: password,
       password_confirmation: confirmPassword,
-    },
+    // },
   });
 };
 
