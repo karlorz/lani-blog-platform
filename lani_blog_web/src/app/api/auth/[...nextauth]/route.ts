@@ -1,34 +1,41 @@
 import { toSession, toToken } from "@/models/accounts";
 import { LoginResponse } from "@/models/accounts/types";
+import { NextAuthOptions } from "next-auth";
+import { JWT } from "next-auth/jwt";
 import axios from "axios";
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 
 const signIn = async (params: { email: string; password: string }) => {
   const { email, password } = params;
-  const response = await axios.post<{
-    data: LoginResponse;
-  }>(`${process.env.API_URL}/api/session`, {
-    user: {
-      email: email,
-      password: password,
-    },
-  });
+  try {
+    const response = await axios.post(
+      `${process.env.API_URL}/api/v1/auth/authenticate`,
+      {
+        email: email,
+        password: password,
+      }
+    );
+    const responseData = response.data;
 
-  return response.data?.data;
+    return responseData;
+  } catch (error: any) {
+    if (error.response && error.response.status === 401) {
+      console.log(error.response.statusText);
+    }
+    return null;
+  }
 };
 
 const refreshToken = async (params: { token: string }) => {
   const { token } = params;
-  const response = await axios.post<{
-    data: LoginResponse;
-  }>(
-    `${process.env.API_URL}/api/session/renew`,
+  const response = await axios.post(
+    `${process.env.API_URL}/api/v1/auth/refresh-token`,
     {},
     { headers: { Authorization: token } }
   );
 
-  return response.data?.data;
+  return response.data;
 };
 
 const handler = NextAuth({
@@ -44,23 +51,25 @@ const handler = NextAuth({
         if (!credentials || !credentials?.username || !credentials?.password) {
           return null;
         }
-
-        return signIn({
+        const user = await signIn({
           email: credentials?.username,
           password: credentials?.password,
         });
+        return user;
       },
     }),
   ],
   callbacks: {
     async jwt({ token, account, user }) {
       if (user) {
+        // console.log(user);
         return toToken(user);
       }
-
+      // console.log(token)
       if (new Date() < new Date(token.expiredAt)) {
         return token;
       }
+      // return await refreshToken(token);
 
       try {
         const response = await refreshToken({
@@ -76,6 +85,7 @@ const handler = NextAuth({
       }
     },
     async session({ session, token }) {
+      // console.log(token);
       return toSession(token, session);
     },
   },

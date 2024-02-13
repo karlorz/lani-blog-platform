@@ -1,8 +1,8 @@
 export interface LoginResponse {
-  id: string;
+  // id: string;
   access_token: string;
   expired_at: string;
-  renewal_token: string;
+  refresh_token: string;
   user: {
     email: string;
   };
@@ -15,7 +15,7 @@ export interface TokenInfo {
   user: {
     email: string;
   };
-  error?: string;
+  // error?: string;
 }
 
 export interface SessionInfo {
@@ -23,5 +23,5 @@ export interface SessionInfo {
   user: {
     email: string;
   };
-  error?: string;
+  // error?: string;
 }

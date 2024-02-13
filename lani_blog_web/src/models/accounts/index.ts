@@ -6,7 +6,7 @@ export const toToken = (loginResponse: LoginResponse): JWT => {
   return {
     accessToken: loginResponse.access_token,
     expiredAt: loginResponse.expired_at,
-    refreshToken: loginResponse.renewal_token,
+    refreshToken: loginResponse.refresh_token,
     user: loginResponse.user,
   };
 };
@@ -17,7 +17,7 @@ export const toSession = (
 ): Session => {
   return {
     ...(defaultSession || {}),
-    error: token.error,
+    // error: token.error,
     user: {
       ...(defaultSession?.user || {}),
       ...token.user,
