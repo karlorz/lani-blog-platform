@@ -2,7 +2,7 @@ import PostList from "./PostList";
 
 async function getData() {
   const res = await fetch(`${process.env.API_URL}/api/posts`, {
-    cache: "no-store",
+    // cache: "no-store",
     next: { revalidate: 0 },
   });
 
